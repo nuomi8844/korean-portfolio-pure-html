@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人链接页面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 头像和个人信息 */
+        .profile-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
+        }
+
+        .profile-name {
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .profile-bio {
+            color: rgba(255,255,255,0.9);
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        /* 第一段文字描述 */
+        .text-section {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .text-content {
+            color: #374151;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* 相册画廊 */
+        .gallery-section {
+            margin-bottom: 20px;
+        }
+
+        .gallery-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .gallery-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+
+        .gallery-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: white;
+            padding: 12px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        /* 链接卡片 */
+        .links-section {
+            margin-bottom: 20px;
+        }
+
+        .link-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .link-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .link-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .link-content {
+            flex: 1;
+        }
+
+        .link-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .link-description {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* 第二段文字描述 */
+        .bottom-text-section {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* 第二个相册 */
+        .gallery2-section {
+            margin-bottom: 20px;
+        }
+
+        /* 最终文字描述 */
+        .final-text-section {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* 管理按钮（隐藏） */
+        .admin-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: #3b82f6;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #374151;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .password-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .edit-section {
+            display: none;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 16px;
+            }
+
+            .gallery-grid {
+                gap: 8px;
+            }
+
+            .link-card {
+                padding: 12px;
+            }
+
+            .link-image {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 个人资料区域 -->
+        <div class="profile-section">
+            <img src="images/hero/avatar.png" alt="头像" class="avatar" id="avatar">
+            <h1 class="profile-name" id="profileName">你的名字</h1>
+            <p class="profile-bio" id="profileBio">这里是个人简介，可以介绍自己的身份和特色</p>
+        </div>
+
+        <!-- 第一段文字描述 -->
+        <div class="text-section">
+            <p class="text-content" id="topSection">
+                这里是第一段文字描述，可以介绍你的背景、兴趣爱好或者其他想要分享的内容。你可以随时修改这些文字。
+            </p>
+        </div>
+
+        <!-- 第一个相册画廊 -->
+        <div class="gallery-section">
+            <h2 class="gallery-title">精彩瞬间</h2>
+            <div class="gallery-grid" id="gallery1">
+                <!-- 相册图片将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <!-- 第一组链接卡片 -->
+        <div class="links-section" id="linksGroup1">
+            <!-- 链接卡片将通过JavaScript动态生成 -->
+        </div>
+
+        <!-- 第二段文字描述 -->
+        <div class="bottom-text-section">
+            <p class="text-content" id="bottomSection">
+                这里是第二段文字描述，可以添加更多个人信息或者联系方式的说明。
+            </p>
+        </div>
+
+        <!-- 第二个相册画廊 -->
+        <div class="gallery2-section">
+            <h2 class="gallery-title">更多精彩</h2>
+            <div class="gallery-grid" id="gallery2">
+                <!-- 第二个相册图片将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <!-- 第二组链接卡片 -->
+        <div class="links-section" id="linksGroup2">
+            <!-- 第二组链接卡片将通过JavaScript动态生成 -->
+        </div>
+
+        <!-- 最终文字描述 -->
+        <div class="final-text-section">
+            <p class="text-content" id="finalSection">
+                感谢访问我的个人页面！如有任何问题或合作意向，欢迎通过上面的链接联系我。
+            </p>
+        </div>
+    </div>
+
+    <!-- 管理按钮（默认隐藏） -->
+    <button class="admin-button" id="adminButton" onclick="showPasswordModal()">⚙️</button>
+
+    <!-- 密码验证模态框 -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-content">
+            <h2 class="modal-title">管理员登录</h2>
+            <div class="password-section">
+                <div class="form-group">
+                    <label class="form-label">输入管理密码：</label>
+                    <input type="password" class="form-input" id="passwordInput" placeholder="请输入密码">
+                </div>
+                <button class="btn btn-primary" onclick="checkPassword()">确认</button>
+                <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑模态框 -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <h2 class="modal-title">内容管理</h2>
+            <div class="edit-section" id="editSection">
+                <!-- 个人资料编辑 -->
+                <div class="form-group">
+                    <label class="form-label">个人姓名：</label>
+                    <input type="text" class="form-input" id="editName">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">个人简介：</label>
+                    <textarea class="form-textarea" id="editBio"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">第一段文字：</label>
+                    <textarea class="form-textarea" id="editTopSection"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">第二段文字：</label>
+                    <textarea class="form-textarea" id="editBottomSection"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">最终文字：</label>
+                    <textarea class="form-textarea" id="editFinalSection"></textarea>
+                </div>
+
+                <button class="btn btn-primary" onclick="saveChanges()">保存更改</button>
+                <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 网站内容配置 - 您可以直接修改这些内容
+        const siteConfig = {
+            // 个人资料
+            profile: {
+                name: "你的名字",
+                bio: "这里是个人简介，可以介绍自己的身份和特色",
+                avatar: "images/hero/avatar.png"
+            },
+
+            // 文字内容
+            textSections: {
+                top: "这里是第一段文字描述，可以介绍你的背景、兴趣爱好或者其他想要分享的内容。你可以随时修改这些文字。",
+                bottom: "这里是第二段文字描述，可以添加更多个人信息或者联系方式的说明。",
+                final: "感谢访问我的个人页面！如有任何问题或合作意向，欢迎通过上面的链接联系我。"
+            },
+
+            // 第一组链接（在第一个相册后）
+            linksGroup1: [
+                {
+                    title: "Telegram",
+                    description: "即时聊天联系",
+                    url: "https://t.me/yourusername",
+                    image: "images/links/telegram.png"
+                },
+                {
+                    title: "LINE",
+                    description: "日常交流",
+                    url: "https://line.me/ti/p/yourlineid",
+                    image: "images/links/line.png"
+                }
+            ],
+
+            // 第二组链接（在第二个相册后）
+            linksGroup2: [
+                {
+                    title: "Instagram",
+                    description: "生活分享",
+                    url: "https://instagram.com/yourusername",
+                    image: "images/links/instagram.png"
+                },
+                {
+                    title: "微信",
+                    description: "商务合作",
+                    url: "#",
+                    image: "images/links/wechat.png"
+                }
+            ],
+
+            // 第一个相册图片
+            gallery1: [
+                { image: "images/gallery/photo1.png", description: "第一张图片描述", link: "https://t.me/yourusername" },
+                { image: "images/gallery/photo2.png", description: "第二张图片描述", link: "https://line.me/ti/p/yourlineid" },
+                { image: "images/gallery/photo3.png", description: "第三张图片描述", link: "https://t.me/yourusername" },
+                { image: "images/gallery/photo4.png", description: "第四张图片描述", link: "https://line.me/ti/p/yourlineid" },
+                { image: "images/gallery/photo5.png", description: "第五张图片描述", link: "https://t.me/yourusername" },
+                { image: "images/gallery/photo6.png", description: "第六张图片描述", link: "https://line.me/ti/p/yourlineid" },
+                { image: "images/gallery/photo7.png", description: "第七张图片描述", link: "https://t.me/yourusername" },
+                { image: "images/gallery/photo8.png", description: "第八张图片描述", link: "https://line.me/ti/p/yourlineid" },
+                { image: "images/gallery/photo9.png", description: "第九张图片描述", link: "https://t.me/yourusername" },
+                { image: "images/gallery/photo10.png", description: "第十张图片描述", link: "https://line.me/ti/p/yourlineid" }
+            ],
+
+            // 第二个相册图片
+            gallery2: [
+                { image: "images/gallery2/photo1.png", description: "第二相册第一张", link: "https://t.me/yourusername" },
+                { image: "images/gallery2/photo2.png", description: "第二相册第二张", link: "https://line.me/ti/p/yourlineid" },
+                { image: "images/gallery2/photo3.png", description: "第二相册第三张", link: "https://t.me/yourusername" },
+                { image: "images/gallery2/photo4.png", description: "第二相册第四张", link: "https://line.me/ti/p/yourlineid" },
+                { image: "images/gallery2/photo5.png", description: "第二相册第五张", link: "https://t.me/yourusername" },
+                { image: "images/gallery2/photo6.png", description: "第二相册第六张", link: "https://line.me/ti/p/yourlineid" },
+                { image: "images/gallery2/photo7.png", description: "第二相册第七张", link: "https://t.me/yourusername" },
+                { image: "images/gallery2/photo8.png", description: "第二相册第八张", link: "https://line.me/ti/p/yourlineid" },
+                { image: "images/gallery2/photo9.png", description: "第二相册第九张", link: "https://t.me/yourusername" },
+                { image: "images/gallery2/photo10.png", description: "第二相册第十张", link: "https://line.me/ti/p/yourlineid" }
+            ]
+        };
+
+        // 管理员密码
+        const adminPassword = "qwe5566@";
+
+        // 初始化页面
+        function initializePage() {
+            // 设置个人资料
+            document.getElementById('profileName').textContent = siteConfig.profile.name;
+            document.getElementById('profileBio').textContent = siteConfig.profile.bio;
+            document.getElementById('avatar').src = siteConfig.profile.avatar;
+
+            // 设置文字内容
+            document.getElementById('topSection').textContent = siteConfig.textSections.top;
+            document.getElementById('bottomSection').textContent = siteConfig.textSections.bottom;
+            document.getElementById('finalSection').textContent = siteConfig.textSections.final;
+
+            // 生成第一组链接
+            generateLinks('linksGroup1', siteConfig.linksGroup1);
+
+            // 生成第二组链接
+            generateLinks('linksGroup2', siteConfig.linksGroup2);
+
+            // 生成第一个相册
+            generateGallery('gallery1', siteConfig.gallery1);
+
+            // 生成第二个相册
+            generateGallery('gallery2', siteConfig.gallery2);
+        }
+
+        // 生成链接卡片
+        function generateLinks(containerId, links) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            links.forEach(link => {
+                const linkElement = document.createElement('a');
+                linkElement.className = 'link-card';
+                linkElement.href = link.url;
+                linkElement.target = '_blank';
+                linkElement.innerHTML = `
+                    <img src="${link.image}" alt="${link.title}" class="link-image">
+                    <div class="link-content">
+                        <div class="link-title">${link.title}</div>
+                        <div class="link-description">${link.description}</div>
+                    </div>
+                `;
+                container.appendChild(linkElement);
+            });
+        }
+
+        // 生成相册
+        function generateGallery(containerId, gallery) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            gallery.forEach(item => {
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'gallery-item';
+                galleryItem.onclick = () => window.open(item.link, '_blank');
+                galleryItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.description}" class="gallery-image">
+                    <div class="gallery-overlay">${item.description}</div>
+                `;
+                container.appendChild(galleryItem);
+            });
+        }
+
+        // 显示密码输入模态框
+        function showPasswordModal() {
+            document.getElementById('passwordModal').style.display = 'block';
+        }
+
+        // 检查密码
+        function checkPassword() {
+            const inputPassword = document.getElementById('passwordInput').value;
+            if (inputPassword === adminPassword) {
+                document.getElementById('passwordModal').style.display = 'none';
+                showEditModal();
+            } else {
+                alert('密码错误！');
+            }
+            document.getElementById('passwordInput').value = '';
+        }
+
+        // 显示编辑模态框
+        function showEditModal() {
+            // 填充当前值
+            document.getElementById('editName').value = siteConfig.profile.name;
+            document.getElementById('editBio').value = siteConfig.profile.bio;
+            document.getElementById('editTopSection').value = siteConfig.textSections.top;
+            document.getElementById('editBottomSection').value = siteConfig.textSections.bottom;
+            document.getElementById('editFinalSection').value = siteConfig.textSections.final;
+
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        // 保存更改
+        function saveChanges() {
+            // 更新配置
+            siteConfig.profile.name = document.getElementById('editName').value;
+            siteConfig.profile.bio = document.getElementById('editBio').value;
+            siteConfig.textSections.top = document.getElementById('editTopSection').value;
+            siteConfig.textSections.bottom = document.getElementById('editBottomSection').value;
+            siteConfig.textSections.final = document.getElementById('editFinalSection').value;
+
+            // 重新初始化页面
+            initializePage();
+
+            // 保存到本地存储
+            localStorage.setItem('siteConfig', JSON.stringify(siteConfig));
+
+            closeModal();
+            alert('更改已保存！');
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // 键盘快捷键 Ctrl+Shift+A 显示管理按钮
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+                document.getElementById('adminButton').style.display = 'block';
+            }
+        });
+
+        // 从本地存储加载配置
+        function loadFromStorage() {
+            const saved = localStorage.getItem('siteConfig');
+            if (saved) {
+                const savedConfig = JSON.parse(saved);
+                Object.assign(siteConfig, savedConfig);
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFromStorage();
+            initializePage();
+        });
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const passwordModal = document.getElementById('passwordModal');
+            const editModal = document.getElementById('editModal');
+            if (event.target === passwordModal || event.target === editModal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
